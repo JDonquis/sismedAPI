@@ -27,7 +27,7 @@ class RefreshInventoryGeneral
         $arrayProduct = $event->arrayProductWithEntityCode;
         
         foreach ($arrayProduct as $entityCode => $arrayProductIds)
-        {
+        {   
             $inventoriesLote = Inventory::where('entity_code',$entityCode)->whereIn('product_id',$arrayProductIds)->get();
 
 
@@ -75,23 +75,25 @@ class RefreshInventoryGeneral
             }
 
             foreach ($dataToInsert as $productId => $values)
-            {
+            {   
+
                 $search = Product::select('search')->where('id',$productId)->first();
-                InventoryGeneral::updateOrCreate([
+                $entityCodeToSearch = strval($entityCode);
 
-                    'entity_code' => $entityCode,
+
+                $newInventory = InventoryGeneral::firstOrNew([
+                    'entity_code' => $entityCodeToSearch,
                     'product_id' => $productId,
+                ]);
 
-                ],
-                [
-                    'stock' => $values['stock'],
-                    'stock_bad' => $values['stock_bad'],
-                    'stock_expired' => $values['stock_expired'],
-                    'entries' => $values['entries'],
-                    'outputs' => $values['outputs'],
-                    'search' => $search->search,
-                ]
-             );
+                $newInventory->stock = $values['stock'];
+                $newInventory->stock_bad = $values['stock_bad'];
+                $newInventory->stock_expired = $values['stock_expired'];
+                $newInventory->entries = $values['entries'];
+                $newInventory->outputs = $values['outputs'];
+                $newInventory->search = $search->search;
+
+                $newInventory->save();
 
             }
             

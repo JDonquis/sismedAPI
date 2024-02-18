@@ -129,7 +129,7 @@ class ApiFilter
 
             $likeString = $this->generateString($value);
 
-            $query[$tableName][] = ['search','ILIKE',$likeString,'OR'];    
+            $query[$tableName][] = ['search','LIKE',$likeString,'OR'];    
             
             return $query;
     }
